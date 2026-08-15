@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Production image for the Node server build (.output/).
+# Production image for the Node server build (dist/).
 # Build with:  docker build --build-arg NITRO_PRESET=node_server -t gameflex .
 # Run with:    docker run -p 8080:8080 --env-file .env gameflex
 # ---------------------------------------------------------------------------
@@ -19,7 +19,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 
-COPY --from=build /app/.output ./.output
+COPY --from=build /app/dist ./dist
 
 EXPOSE 8080
 USER node
@@ -27,4 +27,4 @@ USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8080)+'/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "dist/server/index.mjs"]

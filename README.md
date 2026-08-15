@@ -28,8 +28,8 @@ The app runs at http://localhost:8080.
 | Script              | Purpose                                                |
 | ------------------- | ------------------------------------------------------ |
 | `npm run dev`       | Start the dev server with HMR                          |
-| `npm run build`     | Production build (`.output/`)                          |
-| `npm start`         | Run the built server (`node .output/server/index.mjs`) |
+| `npm run build`     | Production build (`dist/`)                          |
+| `npm start`         | Run the built server (`node dist/server/index.mjs`) |
 | `npm run typecheck` | TypeScript check, no emit                              |
 | `npm run lint`      | ESLint                                                 |
 | `npm run format`    | Prettier                                               |
@@ -74,7 +74,7 @@ SQL migrations live in `supabase/migrations/`. Apply them with the Supabase CLI
 
 ## Deployment
 
-`npm run build` produces a self-contained server bundle in `.output/`. Deploy it
+`npm run build` produces a self-contained server bundle in `dist/`. Deploy it
 anywhere that runs Node or a Worker runtime (VPS, Docker, Fly.io, Render,
 Cloudflare, …) and set the same environment variables in that environment.
 

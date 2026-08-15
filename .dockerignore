@@ -1,9 +1,8 @@
 node_modules
-.output
+dist
 .nitro
 .tanstack
 .vinxi
-dist
 dist-ssr
 .git
 .env
