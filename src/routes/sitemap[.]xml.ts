@@ -25,9 +25,7 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: ({ request }) => {
         const origin =
-          process.env["SITE_URL"] ??
-          process.env["VITE_SITE_URL"] ??
-          new URL(request.url).origin;
+          process.env["SITE_URL"] ?? process.env["VITE_SITE_URL"] ?? new URL(request.url).origin;
         const base = origin.replace(/\/$/, "");
         const lastmod = new Date().toISOString().slice(0, 10);
         const urls = PATHS.map(

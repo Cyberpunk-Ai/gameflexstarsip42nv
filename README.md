@@ -95,7 +95,6 @@ Operational endpoints:
 Pre-deploy checklist: `npm run lint`, `bunx tsgo --noEmit`, `npm run build`, and
 apply pending SQL from `supabase/migrations/`.
 
-
 ## Project structure
 
 ```
