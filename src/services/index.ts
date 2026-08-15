@@ -14,5 +14,16 @@ export * from "./realtime";
 export * from "./marketplace";
 export * from "./messages";
 export * from "./achievements";
-export type { Profile as AdminProfile } from "./admin";
+export type {
+  Profile as AdminProfile,
+  UserRole,
+  AppRole,
+  SupportTicket,
+  TicketMessage,
+  Reward,
+  Registration,
+  Referral,
+  Match,
+  GameRoom,
+} from "./admin";
 export { AdminService, adminService } from "./admin";

@@ -59,12 +59,12 @@ export default function AdminRoles() {
     },
   });
 
-  const getProfile = (userId: string) => profiles.find((p: any) => p.user_id === userId);
+  const getProfile = (userId: string) => profiles.find((p) => p.user_id === userId);
 
   const addRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       // Check if role already exists
-      const existing = userRoles.find((r: any) => r.user_id === userId && r.role === role);
+      const existing = userRoles.find((r) => r.user_id === userId && r.role === role);
       if (existing) throw new Error("User already has this role");
 
       const { error } = await backend.from("user_roles").insert({ user_id: userId, role });
@@ -219,7 +219,7 @@ export default function AdminRoles() {
             ) : filteredRoles.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">No roles found</div>
             ) : (
-              filteredRoles.map((role: any) => {
+              filteredRoles.map((role) => {
                 const profile = getProfile(role.user_id);
                 const isSuperAdminEmail =
                   profile?.email?.toLowerCase().trim() === "gameflex254@gmail.com";
@@ -231,7 +231,7 @@ export default function AdminRoles() {
                   >
                     <div className="col-span-2 flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={profile?.avatar_url} />
+                        <AvatarImage src={profile?.avatar_url ?? undefined} />
                         <AvatarFallback className="bg-primary/20 text-primary">
                           {(profile?.username ?? "U").slice(0, 2).toUpperCase()}
                         </AvatarFallback>

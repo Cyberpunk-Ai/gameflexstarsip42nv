@@ -473,7 +473,7 @@ export default function AdminReferrals() {
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={item.referred?.avatar_url} />
+                            <AvatarImage src={item.referred?.avatar_url ?? undefined} />
                             <AvatarFallback className="text-xs font-bold bg-secondary">
                               {item.referred?.username?.slice(0, 2).toUpperCase() || "N"}
                             </AvatarFallback>

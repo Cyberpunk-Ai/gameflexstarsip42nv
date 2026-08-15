@@ -192,7 +192,7 @@ export function NewConversationModal({
                   disabled={createConversationMutation.isPending}
                 >
                   <Avatar className="h-10 w-10 flex-shrink-0">
-                    <AvatarImage src={u.avatar_url} />
+                    <AvatarImage src={u.avatar_url ?? undefined} />
                     <AvatarFallback>{u.username?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium text-sm">{u.username}</span>
