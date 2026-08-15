@@ -14,7 +14,9 @@ export function usePWA() {
       setHasInstallPrompt(true);
       try {
         (window as any).__GAMEFLEX_DEFERRED_PROMPT = e;
-      } catch (e) {}
+      } catch {
+        /* non-critical: ignore */
+      }
     };
     window.addEventListener("beforeinstallprompt", handler as any);
 
@@ -66,11 +68,15 @@ export function usePWA() {
       setDeferredPrompt(null);
       try {
         (window as any).__GAMEFLEX_DEFERRED_PROMPT = null;
-      } catch (e) {}
+      } catch {
+        /* non-critical: ignore */
+      }
       if (choice?.outcome === "accepted") {
         try {
           localStorage.setItem("gameflex_installed", "1");
-        } catch (e) {}
+        } catch {
+          /* non-critical: ignore */
+        }
         setIsInstalled(true);
       }
       return choice;
@@ -78,7 +84,9 @@ export function usePWA() {
       setDeferredPrompt(null);
       try {
         (window as any).__GAMEFLEX_DEFERRED_PROMPT = null;
-      } catch (e) {}
+      } catch {
+        /* non-critical: ignore */
+      }
       return null;
     }
   }, [deferredPrompt]);
@@ -86,7 +94,9 @@ export function usePWA() {
   const hideInstallLink = useCallback(() => {
     try {
       localStorage.setItem("gameflex_installed", "1");
-    } catch (e) {}
+    } catch {
+      /* non-critical: ignore */
+    }
     setIsInstalled(true);
   }, []);
 

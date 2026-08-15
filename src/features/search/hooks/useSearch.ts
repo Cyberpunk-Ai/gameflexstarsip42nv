@@ -9,7 +9,6 @@ export function useSearch() {
     queryKey: QUERY_KEYS.search.results(query),
     queryFn: async () => {
       if (!query) return [];
-      // @ts-ignore
       const { searchService } = await import("@/services/search/SearchService");
       return searchService.search(query);
     },

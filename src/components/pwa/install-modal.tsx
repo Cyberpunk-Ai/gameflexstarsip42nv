@@ -23,7 +23,9 @@ export function InstallModal({
         if (res?.outcome === "accepted") {
           try {
             hideInstallLink();
-          } catch (e) {}
+          } catch {
+            /* non-critical: ignore */
+          }
           onOpenChange(false);
           // navigate to root; installed apps will open from Home Screen.
           navigate("/");
@@ -79,7 +81,9 @@ export function InstallModal({
                 if (res?.outcome === "accepted") {
                   try {
                     hideInstallLink();
-                  } catch (e) {}
+                  } catch {
+                    /* non-critical: ignore */
+                  }
                   onOpenChange(false);
                   navigate("/");
                 }

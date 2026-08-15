@@ -54,7 +54,6 @@ export async function track(
       device: getDevice(),
       path: window.location.pathname,
     };
-    // @ts-ignore — table added via migration
     await backend.from("analytics_events").insert(payload);
   } catch (err) {
     if (import.meta.env.DEV) console.warn("[analytics] track failed", err);

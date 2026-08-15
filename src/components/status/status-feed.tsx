@@ -473,7 +473,9 @@ export function StatusFeed({
           entityId: id,
           action: "view",
         });
-      } catch {}
+      } catch {
+        /* non-critical: ignore */
+      }
     },
     [user?.id],
   );
@@ -628,7 +630,9 @@ export function StatusFeed({
       try {
         await navigator.share({ title: "Check out this post on GameFlex", url });
         return;
-      } catch {}
+      } catch {
+        /* non-critical: ignore */
+      }
       void recommendationEventService.recordEvent({
         userId: user?.id ?? null,
         entityType: "post",
