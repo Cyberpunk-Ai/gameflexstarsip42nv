@@ -19,12 +19,13 @@ import {
   useSquadRefresh,
 } from "@/features/squads/hooks";
 import { initials, RoleBadge } from "./squad-ui";
+import type { Squad, SquadRole } from "@/features/squads/api";
 import { Link } from "@/lib/router-compat";
 import { Check, Loader2, Trophy, UserMinus, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
-export function SquadRoster({ squad }: { squad: any }) {
+export function SquadRoster({ squad }: { squad: Squad }) {
   const me = useCurrentPlayer();
   const { isOfficer, isOwner } = useMyRole(squad);
   const refresh = useSquadRefresh();
@@ -41,6 +42,7 @@ export function SquadRoster({ squad }: { squad: any }) {
   });
 
   const respond = async (requestId: string, approve: boolean, username: string) => {
+    if (!me) return toast.error("Sign in first");
     setBusy(requestId);
     try {
       await api.respondToJoinRequest(requestId, approve, me.userId);
@@ -168,7 +170,7 @@ export function SquadRoster({ squad }: { squad: any }) {
                     <Select
                       value={m.role}
                       onValueChange={async (v) => {
-                        await api.setMemberRole(squad.id, m.userId, v);
+                        await api.setMemberRole(squad.id, m.userId, v as SquadRole);
                         await refresh();
                         toast.success(`${m.username} is now a ${v.replace("_", "-")}`);
                       }}

@@ -279,7 +279,7 @@ export function SettingsManager({
         bio: bio.trim(),
         website: website.trim(),
         avatar_url: avatarUrl,
-        platform,
+        platform: platform as unknown as import("@/integrations/supabase/types").Database["public"]["Enums"]["platform_type"],
         favorite_genres: favoriteGenres,
         updated_at: new Date().toISOString(),
       };
@@ -723,7 +723,7 @@ export function SettingsManager({
                         <Label className="text-sm font-semibold mb-3 block">Avatar Image</Label>
                         <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-xl bg-muted/40 border border-border/50">
                           <Avatar className="h-20 w-20 border-2 border-primary/40 shadow-lg shrink-0">
-                            <AvatarImage src={avatarUrl || profile?.avatar_url} />
+                            <AvatarImage src={avatarUrl || profile?.avatar_url || undefined} />
                             <AvatarFallback className="text-xl font-bold bg-primary/20 text-primary">
                               {(username || "U").slice(0, 2).toUpperCase()}
                             </AvatarFallback>

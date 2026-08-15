@@ -14,6 +14,7 @@ import * as api from "@/features/squads/api";
 import { useCurrentPlayer, useMyRole, useSquadEvents } from "@/features/squads/hooks";
 import { GAME_TYPES } from "@/constants/game-types";
 import { gameLabel } from "./squad-ui";
+import type { RsvpStatus, SquadEvent, GameType, Squad } from "@/features/squads/api";
 import { CalendarPlus, CalendarClock, Check, HelpCircle, Loader2, Trash2, X } from "lucide-react";
 import { format, formatDistanceToNow, isPast } from "date-fns";
 import { toast } from "sonner";
@@ -24,13 +25,13 @@ const TYPES = [
   { id: "practice", label: "Practice" },
 ];
 
-export function SquadPlanner({ squad }: { squad: any }) {
+export function SquadPlanner({ squad }: { squad: Squad }) {
   const me = useCurrentPlayer();
   const { isOfficer } = useMyRole(squad);
   const { data: events = [], refetch } = useSquadEvents(squad.id);
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState("");
-  const [game, setGame] = useState(squad.game ?? GAME_TYPES[0].id);
+  const [game, setGame] = useState<GameType>((squad.game as GameType) ?? GAME_TYPES[0].id);
   const [type, setType] = useState("tournament");
   const [startsAt, setStartsAt] = useState("");
   const [notes, setNotes] = useState("");
@@ -66,11 +67,11 @@ export function SquadPlanner({ squad }: { squad: any }) {
             </p>
           </div>
         )}
-        {events.map((e: any) => {
-          const counts = { in: 0, out: 0, maybe: 0 };
-          Object.values(e.rsvps ?? {}).forEach((v: any) => (counts[v] = (counts[v] ?? 0) + 1));
+        {events.map((e: SquadEvent) => {
+          const counts: Record<RsvpStatus, number> = { in: 0, out: 0, maybe: 0 };
+          Object.values(e.rsvps ?? {}).forEach((v) => (counts[v] = (counts[v] ?? 0) + 1));
           const mine = me ? e.rsvps?.[me.userId] : undefined;
-          const past = isPast(new Date(e.startsAt));
+          const past = isPast(new Date(e.startsAt ?? Date.now()));
           return (
             <div
               key={e.id}
@@ -82,10 +83,10 @@ export function SquadPlanner({ squad }: { squad: any }) {
               <div className="flex items-start gap-3">
                 <div className="rounded-xl bg-primary/10 border border-primary/25 px-3 py-2 text-center shrink-0">
                   <div className="font-display text-lg font-bold leading-none text-primary">
-                    {format(new Date(e.startsAt), "dd")}
+                    {format(new Date(e.startsAt ?? Date.now()), "dd")}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
-                    {format(new Date(e.startsAt), "MMM")}
+                    {format(new Date(e.startsAt ?? Date.now()), "MMM")}
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">
@@ -96,23 +97,26 @@ export function SquadPlanner({ squad }: { squad: any }) {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {gameLabel(e.game)} · {format(new Date(e.startsAt), "EEE d MMM, HH:mm")} ·{" "}
+                    {gameLabel(e.game)} · {format(new Date(e.startsAt ?? Date.now()), "EEE d MMM, HH:mm")} ·{" "}
                     {past
                       ? "completed"
-                      : formatDistanceToNow(new Date(e.startsAt), { addSuffix: true })}
+                      : formatDistanceToNow(new Date(e.startsAt ?? Date.now()), { addSuffix: true })}
                   </p>
                   {e.notes && <p className="text-xs text-foreground/70 mt-2">{e.notes}</p>}
                   <div className="flex items-center gap-2 mt-3 flex-wrap">
-                    {[
-                      { id: "in", label: "I'm in", icon: Check },
-                      { id: "maybe", label: "Maybe", icon: HelpCircle },
-                      { id: "out", label: "Can't", icon: X },
-                    ].map((opt) => (
+                    {(
+                      [
+                        { id: "in", label: "I'm in", icon: Check },
+                        { id: "maybe", label: "Maybe", icon: HelpCircle },
+                        { id: "out", label: "Can't", icon: X },
+                      ] as { id: RsvpStatus; label: string; icon: typeof Check }[]
+                    ).map((opt) => (
                       <button
                         key={opt.id}
                         type="button"
                         disabled={!me || past}
                         onClick={async () => {
+                          if (!me) return;
                           await api.rsvp(e.id, me.userId, opt.id);
                           refetch();
                         }}
@@ -175,7 +179,7 @@ export function SquadPlanner({ squad }: { squad: any }) {
               ))}
             </SelectContent>
           </Select>
-          <Select value={game} onValueChange={setGame}>
+          <Select value={game} onValueChange={(v) => setGame(v as GameType)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

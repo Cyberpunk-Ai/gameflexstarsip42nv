@@ -310,9 +310,11 @@ export function StatusFeed({
                   .from("status_saves")
                   .select("status_id")
                   .eq("user_id", user.id)
-                  .then((r) => r)
-                  .catch(() => ({ data: [] }))
-              : Promise.resolve({ data: [] }),
+                  .then(
+                    (r) => r,
+                    () => ({ data: [] as { status_id: string }[] }),
+                  )
+              : Promise.resolve({ data: [] as { status_id: string }[] }),
             user
               ? backend.from("user_follows").select("following_id").eq("follower_id", user.id)
               : Promise.resolve({ data: [] }),
@@ -374,8 +376,10 @@ export function StatusFeed({
             .from("status_saves")
             .select("status_id")
             .eq("user_id", user.id)
-            .then((r) => r)
-            .catch(() => ({ data: [] })),
+            .then(
+              (r) => r,
+              () => ({ data: [] as { status_id: string }[] }),
+            ),
           backend.from("user_follows").select("following_id").eq("follower_id", user.id),
         ]);
         userLikes = likesRes.data?.map((l: any) => l.status_id) ?? [];

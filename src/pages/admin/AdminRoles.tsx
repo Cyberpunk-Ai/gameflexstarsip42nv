@@ -95,7 +95,7 @@ export default function AdminRoles() {
     },
   });
 
-  const filteredRoles = userRoles.filter((role: any) => {
+  const filteredRoles = userRoles.filter((role) => {
     const profile = getProfile(role.user_id);
     const matchesSearch =
       profile?.username?.toLowerCase().includes(search.toLowerCase()) ||
@@ -117,17 +117,17 @@ export default function AdminRoles() {
   };
 
   // Get users without a specific elevated role for the dropdown
-  const availableUsers = profiles.filter((p: any) => {
+  const availableUsers = profiles.filter((p) => {
     const existingRoles = userRoles.filter(
-      (r: any) => r.user_id === p.user_id && r.role === selectedRole,
+      (r) => r.user_id === p.user_id && r.role === selectedRole,
     );
     return existingRoles.length === 0;
   });
 
   // Stats
-  const adminCount = userRoles.filter((r: any) => r.role === "admin").length;
-  const modCount = userRoles.filter((r: any) => r.role === "moderator").length;
-  const userCount = userRoles.filter((r: any) => r.role === "user").length;
+  const adminCount = userRoles.filter((r) => r.role === "admin").length;
+  const modCount = userRoles.filter((r) => r.role === "moderator").length;
+  const userCount = userRoles.filter((r) => r.role === "user").length;
 
   return (
     <div>
@@ -313,7 +313,7 @@ export default function AdminRoles() {
                   <SelectValue placeholder="Select a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableUsers.map((p: any) => (
+                  {availableUsers.map((p) => (
                     <SelectItem key={p.user_id} value={p.user_id}>
                       {p.username} ({p.email || "No email"})
                     </SelectItem>

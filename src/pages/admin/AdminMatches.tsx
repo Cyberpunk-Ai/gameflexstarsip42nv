@@ -156,14 +156,32 @@ export default function AdminMatches() {
         scheduled_at: "",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
   const updateMatchMutation = useMutation({
-    mutationFn: async ({ id, status, player1_score, player2_score, winner_id }: any) => {
-      const update: any = { status };
+    mutationFn: async ({
+      id,
+      status,
+      player1_score,
+      player2_score,
+      winner_id,
+    }: {
+      id: string;
+      status: "scheduled" | "live" | "completed" | "cancelled";
+      player1_score?: number;
+      player2_score?: number;
+      winner_id?: string;
+    }) => {
+      const update: {
+        status: "scheduled" | "live" | "completed" | "cancelled";
+        player1_score?: number;
+        player2_score?: number;
+        winner_id?: string;
+        completed_at?: string;
+      } = { status };
       if (player1_score !== undefined) update.player1_score = player1_score;
       if (player2_score !== undefined) update.player2_score = player2_score;
       if (winner_id) {
@@ -192,7 +210,7 @@ export default function AdminMatches() {
       }
       setSelectedMatch(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
@@ -201,7 +219,8 @@ export default function AdminMatches() {
     updateMatchMutation.mutate({ id: matchId, status: "live" });
   };
 
-  const completeMatch = (match: any, winnerId: string) => {
+  const completeMatch = (match: { id: string }, winnerId: string | null) => {
+    if (!winnerId) return;
     updateMatchMutation.mutate({
       id: match.id,
       status: "completed",
@@ -211,7 +230,8 @@ export default function AdminMatches() {
     });
   };
 
-  const groupedMatches = matches.reduce((acc: any, match: any) => {
+  type MatchRow = (typeof matches)[number];
+  const groupedMatches = matches.reduce<Record<string, MatchRow[]>>((acc, match) => {
     const round = `Round ${match.round}`;
     if (!acc[round]) acc[round] = [];
     acc[round].push(match);
@@ -253,7 +273,7 @@ export default function AdminMatches() {
                     <SelectValue placeholder="Select tournament" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tournaments.map((t: any) => (
+                    {tournaments.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
                         {t.title}
                       </SelectItem>
@@ -292,7 +312,7 @@ export default function AdminMatches() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">TBD</SelectItem>
-                    {confirmedPlayers.map((p: any) => (
+                    {confirmedPlayers.map((p) => (
                       <SelectItem key={p.user_id} value={p.user_id}>
                         {p.username} ({p.game_handle})
                       </SelectItem>
@@ -311,7 +331,7 @@ export default function AdminMatches() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">TBD</SelectItem>
-                    {confirmedPlayers.map((p: any) => (
+                    {confirmedPlayers.map((p) => (
                       <SelectItem key={p.user_id} value={p.user_id}>
                         {p.username} ({p.game_handle})
                       </SelectItem>
@@ -351,7 +371,7 @@ export default function AdminMatches() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tournaments</SelectItem>
-            {tournaments.map((t: any) => (
+            {tournaments.map((t) => (
               <SelectItem key={t.id} value={t.id}>
                 {t.title}
               </SelectItem>
@@ -367,14 +387,14 @@ export default function AdminMatches() {
         </div>
       ) : Object.keys(groupedMatches).length > 0 ? (
         <div className="space-y-8 max-h-[calc(100vh-220px)] min-h-[350px] overflow-y-auto pr-2">
-          {Object.entries(groupedMatches).map(([round, roundMatches]: [string, any]) => (
+          {Object.entries(groupedMatches).map(([round, roundMatches]) => (
             <div key={round}>
               <h2 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-primary" />
                 {round}
               </h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {roundMatches.map((match: any) => (
+                {roundMatches.map((match) => (
                   <div
                     key={match.id}
                     className={`rounded-xl bg-card border p-4 ${

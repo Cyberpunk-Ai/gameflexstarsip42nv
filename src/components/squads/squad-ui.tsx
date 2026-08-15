@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { GAME_TYPES } from "@/constants/game-types";
+import type { GameType } from "@/features/squads/api";
 import * as api from "@/features/squads/api";
 import { SQUAD_COLORS, ROLE_LABELS, type SquadRole } from "@/features/squads/api";
 import { useCurrentPlayer, usePlayerSearch, useSquadRefresh } from "@/features/squads/hooks";
@@ -37,7 +38,7 @@ export function initials(name?: string) {
   return (name ?? "?").slice(0, 2).toUpperCase();
 }
 
-export function gameLabel(id?: string) {
+export function gameLabel(id?: string | null) {
   return GAME_TYPES.find((g) => g.id === id)?.label ?? id ?? "Any game";
 }
 
@@ -95,7 +96,7 @@ export function CreateSquadDialog({ trigger }: { trigger?: React.ReactNode }) {
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState("");
   const [tag, setTag] = useState("");
-  const [game, setGame] = useState(GAME_TYPES[0].id);
+  const [game, setGame] = useState<GameType>(GAME_TYPES[0].id);
   const [bio, setBio] = useState("");
   const [color, setColor] = useState(SQUAD_COLORS[0].value);
   const [isPublic, setIsPublic] = useState(true);
@@ -169,7 +170,7 @@ export function CreateSquadDialog({ trigger }: { trigger?: React.ReactNode }) {
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-muted-foreground">Main game</label>
-            <Select value={game} onValueChange={setGame}>
+            <Select value={game} onValueChange={(v) => setGame(v as GameType)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

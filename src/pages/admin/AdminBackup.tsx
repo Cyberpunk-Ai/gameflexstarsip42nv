@@ -94,7 +94,7 @@ export default function AdminBackup() {
 
   const createMutation = useMutation({
     mutationFn: () => runBackup({ data: { label, includeStorage } }),
-    onSuccess: (res: any) => {
+    onSuccess: (res: { removed?: number } | undefined) => {
       setLabel("");
       toast.success(
         res?.removed
@@ -103,13 +103,13 @@ export default function AdminBackup() {
       );
       queryClient.invalidateQueries({ queryKey: ["admin-backups"] });
     },
-    onError: (err: any) => toast.error("Backup failed: " + err.message),
+    onError: (err: Error) => toast.error("Backup failed: " + err.message),
   });
 
   const pinMutation = useMutation({
     mutationFn: (vars: { id: string; pinned: boolean }) => pinBackup({ data: vars }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-backups"] }),
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteMutation = useMutation({
@@ -118,15 +118,15 @@ export default function AdminBackup() {
       toast.success("Snapshot deleted");
       queryClient.invalidateQueries({ queryKey: ["admin-backups"] });
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: Error) => toast.error(err.message),
   });
 
   const handleDownload = async (id: string) => {
     try {
       const { url } = await downloadBackup({ data: { id } });
       window.open(url, "_blank", "noopener");
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Download failed");
     }
   };
 
@@ -140,16 +140,16 @@ export default function AdminBackup() {
       else if (formatType === "csv") exportAsCSV(data ?? [], filename);
       else exportAsSQL(table, data ?? [], filename);
       toast.success(`Exported ${data?.length ?? 0} rows from ${table}`);
-    } catch (err: any) {
-      toast.error("Export failed: " + err.message);
+    } catch (err) {
+      toast.error("Export failed: " + (err instanceof Error ? err.message : "Unknown error"));
     } finally {
       setExporting(null);
     }
   };
 
   const totalRows = Object.values(counts as Record<string, number>).reduce((a, b) => a + b, 0);
-  const retained = backups.filter((b: any) => !b.pinned && b.status === "completed").length;
-  const latest = backups.find((b: any) => b.status === "completed");
+  const retained = backups.filter((b) => !b.pinned && b.status === "completed").length;
+  const latest = backups.find((b) => b.status === "completed");
 
   return (
     <div className="space-y-6">
@@ -268,7 +268,7 @@ export default function AdminBackup() {
             </p>
           ) : (
             <div className="space-y-2">
-              {backups.map((b: any) => (
+              {backups.map((b) => (
                 <div
                   key={b.id}
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg bg-secondary/30"

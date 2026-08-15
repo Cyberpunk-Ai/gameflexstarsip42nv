@@ -3,9 +3,25 @@
  * chat and planning are shared across every player and device.
  */
 import { backend } from "@/backend";
+import type { Database, Json } from "@/integrations/supabase/types";
 
 export type SquadRole = "captain" | "co_captain" | "player" | "sub";
 export type RsvpStatus = "in" | "out" | "maybe";
+export type GameType = Database["public"]["Enums"]["game_type"];
+export type InviteStatus = Database["public"]["Enums"]["squad_invite_status"];
+
+type SquadRowBase = Database["public"]["Tables"]["squads"]["Row"];
+type SquadMemberRow = Database["public"]["Tables"]["squad_members"]["Row"];
+type SquadRow = SquadRowBase & { squad_members?: SquadMemberRow[] | null };
+type SquadInviteRow = Database["public"]["Tables"]["squad_invites"]["Row"];
+type SquadJoinRequestRow = Database["public"]["Tables"]["squad_join_requests"]["Row"];
+type SquadMessageRow = Database["public"]["Tables"]["squad_messages"]["Row"];
+type SquadEventRow = Database["public"]["Tables"]["squad_events"]["Row"];
+
+interface ProfileInfo {
+  username: string;
+  avatarUrl: string | null;
+}
 
 export const SQUAD_COLORS = [
   { name: "Neon", value: "142 76% 45%" },
@@ -26,31 +42,36 @@ export function isOfficer(role?: string | null) {
   return role === "captain" || role === "co_captain";
 }
 
-async function profileMap(userIds: string[]) {
+function parseRsvps(json: Json | null | undefined): Record<string, RsvpStatus> {
+  if (json && typeof json === "object" && !Array.isArray(json)) {
+    return json as Record<string, RsvpStatus>;
+  }
+  return {};
+}
+
+async function profileMap(userIds: string[]): Promise<Record<string, ProfileInfo>> {
   const ids = [...new Set(userIds.filter(Boolean))];
   if (ids.length === 0) return {};
   const { data } = await backend
     .from("profiles")
     .select("user_id, username, avatar_url")
     .in("user_id", ids);
-  const out: Record<string, { username: string; avatarUrl: string | null }> = {};
+  const out: Record<string, ProfileInfo> = {};
   for (const p of data ?? [])
     out[p.user_id] = { username: p.username ?? "Player", avatarUrl: p.avatar_url ?? null };
   return out;
 }
 
-function shapeSquad(row: any, profiles: Record<string, any>) {
-  const members = (row.squad_members ?? []).map((m: any) => ({
+function shapeSquad(row: SquadRow, profiles: Record<string, ProfileInfo>) {
+  const members = (row.squad_members ?? []).map((m) => ({
     userId: m.user_id,
     role: (m.role ?? "player") as SquadRole,
     joinedAt: m.joined_at,
     username: profiles[m.user_id]?.username ?? "Player",
     avatarUrl: profiles[m.user_id]?.avatarUrl ?? null,
   }));
-  members.sort((a: any, b: any) => {
-    const order = { captain: 0, co_captain: 1, player: 2, sub: 3 } as any;
-    return (order[a.role] ?? 9) - (order[b.role] ?? 9);
-  });
+  const order: Record<SquadRole, number> = { captain: 0, co_captain: 1, player: 2, sub: 3 };
+  members.sort((a, b) => (order[a.role] ?? 9) - (order[b.role] ?? 9));
   return {
     id: row.id,
     name: row.name,
@@ -66,21 +87,24 @@ function shapeSquad(row: any, profiles: Record<string, any>) {
   };
 }
 
+export type Squad = ReturnType<typeof shapeSquad>;
+
 const SQUAD_SELECT = "*, squad_members(user_id, role, joined_at)";
 
-export async function fetchSquads(): Promise<any[]> {
+export async function fetchSquads(): Promise<Squad[]> {
   const { data, error } = await backend
     .from("squads")
     .select(SQUAD_SELECT)
     .order("created_at", { ascending: false });
   if (error) throw error;
+  const rows = (data ?? []) as SquadRow[];
   const profiles = await profileMap(
-    (data ?? []).flatMap((s: any) => (s.squad_members ?? []).map((m: any) => m.user_id)),
+    rows.flatMap((s) => (s.squad_members ?? []).map((m) => m.user_id)),
   );
-  return (data ?? []).map((s: any) => shapeSquad(s, profiles));
+  return rows.map((s) => shapeSquad(s, profiles));
 }
 
-export async function fetchSquad(squadId: string) {
+export async function fetchSquad(squadId: string): Promise<Squad | null> {
   const { data, error } = await backend
     .from("squads")
     .select(SQUAD_SELECT)
@@ -88,14 +112,15 @@ export async function fetchSquad(squadId: string) {
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;
-  const profiles = await profileMap((data.squad_members ?? []).map((m: any) => m.user_id));
-  return shapeSquad(data, profiles);
+  const row = data as SquadRow;
+  const profiles = await profileMap((row.squad_members ?? []).map((m) => m.user_id));
+  return shapeSquad(row, profiles);
 }
 
 export async function createSquad(input: {
   name: string;
   tag: string;
-  game: string;
+  game: GameType;
   bio?: string;
   color?: string;
   isPublic?: boolean;
@@ -118,7 +143,10 @@ export async function createSquad(input: {
   return data.id as string;
 }
 
-export async function updateSquad(squadId: string, patch: Record<string, any>) {
+export async function updateSquad(
+  squadId: string,
+  patch: Database["public"]["Tables"]["squads"]["Update"],
+) {
   const { error } = await backend.from("squads").update(patch).eq("id", squadId);
   if (error) throw error;
 }
@@ -156,11 +184,12 @@ export async function fetchMyInvites(userId: string) {
     .eq("status", "pending")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  const profiles = await profileMap((data ?? []).map((i: any) => i.inviter_id));
-  return (data ?? []).map((i: any) => ({
+  const rows = (data ?? []) as (SquadInviteRow & { squads: SquadRowBase | null })[];
+  const profiles = await profileMap(rows.map((i) => i.inviter_id));
+  return rows.map((i) => ({
     id: i.id,
     squadId: i.squad_id,
-    role: (i.role ?? "player") as SquadRole,
+    role: "player" as SquadRole,
     message: i.message,
     createdAt: i.created_at,
     fromUsername: profiles[i.inviter_id]?.username ?? "A captain",
@@ -181,10 +210,11 @@ export async function fetchSquadInvites(squadId: string) {
     .eq("squad_id", squadId)
     .eq("status", "pending");
   if (error) return [];
-  const profiles = await profileMap((data ?? []).map((i: any) => i.invitee_id));
-  return (data ?? []).map((i: any) => ({
+  const rows = (data ?? []) as SquadInviteRow[];
+  const profiles = await profileMap(rows.map((i) => i.invitee_id));
+  return rows.map((i) => ({
     id: i.id,
-    role: i.role ?? "player",
+    role: "player" as SquadRole,
     toUsername: profiles[i.invitee_id]?.username ?? "Player",
   }));
 }
@@ -208,7 +238,6 @@ export async function invitePlayer(input: {
     squad_id: input.squadId,
     inviter_id: input.inviterId,
     invitee_id: input.inviteeId,
-    role: input.role,
     message: input.message ?? null,
     status: "pending",
   });
@@ -241,8 +270,9 @@ export async function fetchJoinRequests(squadId: string) {
     .eq("status", "pending")
     .order("created_at", { ascending: false });
   if (error) return [];
-  const profiles = await profileMap((data ?? []).map((r: any) => r.user_id));
-  return (data ?? []).map((r: any) => ({
+  const rows = (data ?? []) as SquadJoinRequestRow[];
+  const profiles = await profileMap(rows.map((r) => r.user_id));
+  return rows.map((r) => ({
     id: r.id,
     userId: r.user_id,
     message: r.message,
@@ -257,7 +287,7 @@ export async function fetchMyJoinRequests(userId: string) {
     .from("squad_join_requests")
     .select("id, squad_id, status")
     .eq("user_id", userId);
-  const out: Record<string, string> = {};
+  const out: Record<string, InviteStatus> = {};
   for (const r of data ?? []) out[r.squad_id] = r.status;
   return out;
 }
@@ -278,10 +308,10 @@ export async function requestToJoin(squadId: string, userId: string, message?: s
   if (error) throw error;
 }
 
-export async function respondToJoinRequest(requestId: string, approve: boolean, officerId: string) {
+export async function respondToJoinRequest(requestId: string, approve: boolean, _officerId: string) {
   const { error } = await backend
     .from("squad_join_requests")
-    .update({ status: approve ? "approved" : "rejected", responded_by: officerId })
+    .update({ status: approve ? "accepted" : "rejected", responded_at: new Date().toISOString() })
     .eq("id", requestId);
   if (error) throw error;
 }
@@ -300,7 +330,8 @@ export async function fetchMessages(squadId: string) {
     .order("created_at", { ascending: true })
     .limit(300);
   if (error) throw error;
-  return (data ?? []).map((m: any) => ({
+  const rows = (data ?? []) as SquadMessageRow[];
+  return rows.map((m) => ({
     id: m.id,
     userId: m.is_system ? "system" : m.user_id,
     username: m.username,
@@ -342,7 +373,8 @@ export async function fetchEvents(squadId: string) {
     .eq("squad_id", squadId)
     .order("starts_at", { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((e: any) => ({
+  const rows = (data ?? []) as SquadEventRow[];
+  return rows.map((e) => ({
     id: e.id,
     title: e.title,
     game: e.game,
@@ -350,15 +382,17 @@ export async function fetchEvents(squadId: string) {
     notes: e.notes,
     type: e.type,
     createdBy: e.created_by,
-    rsvps: e.rsvps ?? {},
+    rsvps: parseRsvps(e.rsvps),
   }));
 }
+
+export type SquadEvent = Awaited<ReturnType<typeof fetchEvents>>[number];
 
 export async function addEvent(
   squadId: string,
   input: {
     title: string;
-    game: string;
+    game: GameType;
     startsAt: string;
     notes?: string;
     type?: string;
@@ -373,7 +407,7 @@ export async function addEvent(
     notes: input.notes?.trim() || null,
     type: input.type ?? "tournament",
     created_by: input.createdBy,
-    rsvps: { [input.createdBy]: "in" },
+    rsvps: { [input.createdBy]: "in" } satisfies Record<string, RsvpStatus>,
   });
   if (error) throw error;
 }
@@ -389,7 +423,7 @@ export async function rsvp(eventId: string, userId: string, status: RsvpStatus) 
     .select("rsvps")
     .eq("id", eventId)
     .maybeSingle();
-  const next = { ...(data?.rsvps ?? {}), [userId]: status };
+  const next: Record<string, RsvpStatus> = { ...parseRsvps(data?.rsvps), [userId]: status };
   const { error } = await backend.from("squad_events").update({ rsvps: next }).eq("id", eventId);
   if (error) throw error;
 }

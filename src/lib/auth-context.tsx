@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const fetchProfile = useCallback(
-    async (userId: string, metadata?: any) => {
+    async (userId: string, metadata?: { username?: string; email?: string }) => {
       const { data } = await backend
         .from("profiles")
         .select("*")
@@ -152,8 +152,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select("*")
         .maybeSingle();
 
-      setProfile(inserted ?? profileData);
-      return inserted ?? profileData;
+      const resolved = inserted ?? ({ ...profileData } as Profile);
+      setProfile(resolved);
+      return resolved;
     },
     [generateReferralCode],
   );
@@ -331,7 +332,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           error.code === "PGRST204")
       ) {
         console.warn("Profile update schema fallback active:", error.message);
-        const safeData: Record<string, any> = {};
         const safeKeys = [
           "username",
           "game_handle",
@@ -340,10 +340,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "phone",
           "referral_code",
           "updated_at",
-        ];
+        ] as const;
+        const safeData: Partial<Profile> = {};
         for (const k of safeKeys) {
-          if (k in (data as any)) {
-            safeData[k] = (data as any)[k];
+          if (k in data) {
+            (safeData as Record<string, unknown>)[k] = data[k];
           }
         }
         const retry = await backend.from("profiles").update(safeData).eq("user_id", user.id);
