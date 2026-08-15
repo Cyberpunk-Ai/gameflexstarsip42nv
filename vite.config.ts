@@ -41,7 +41,19 @@ export default defineConfig(({ mode, command }) => {
         server: { entry: "server" },
       }),
       viteReact(),
-      ...(isBuild ? nitro({ preset: env["NITRO_PRESET"] ?? "cloudflare_module" }) : []),
+      ...(isBuild
+        ? nitro({
+            preset: env["NITRO_PRESET"] ?? "cloudflare-module",
+            // Emit a conventional build layout: static client assets in
+            // dist/client, the server bundle in dist/server.
+            output: {
+              dir: env["BUILD_OUTPUT_DIR"] ?? "dist",
+              serverDir: "{{ output.dir }}/server",
+              publicDir: "{{ output.dir }}/client",
+            },
+            cloudflare: { nodeCompat: true, deployConfig: true },
+          })
+        : []),
     ],
   };
 });
