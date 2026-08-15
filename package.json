@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "start": "node .output/server/index.mjs"
+    "start": "node dist/server/index.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
