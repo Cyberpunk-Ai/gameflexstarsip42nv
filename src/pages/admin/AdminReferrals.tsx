@@ -61,13 +61,33 @@ export default function AdminReferrals() {
 
       const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
+      type ReferralProfile = {
+        user_id: string;
+        username: string;
+        avatar_url: string | null;
+        email: string | null;
+        referral_code: string | null;
+      };
+
+      const fallbackReferrer: ReferralProfile = {
+        user_id: "",
+        username: "Unknown User",
+        avatar_url: null,
+        email: null,
+        referral_code: "N/A",
+      };
+      const fallbackReferred: ReferralProfile = {
+        user_id: "",
+        username: "New User",
+        avatar_url: null,
+        email: "",
+        referral_code: null,
+      };
+
       return refData.map((r) => ({
         ...r,
-        referrer: profileMap.get(r.referrer_id) || {
-          username: "Unknown User",
-          referral_code: "N/A",
-        },
-        referred: profileMap.get(r.referred_id) || { username: "New User", email: "" },
+        referrer: profileMap.get(r.referrer_id) || fallbackReferrer,
+        referred: profileMap.get(r.referred_id) || fallbackReferred,
       }));
     },
   });
@@ -80,7 +100,18 @@ export default function AdminReferrals() {
     totalReferrals > 0 ? Math.round((completedReferrals / totalReferrals) * 100) : 0;
 
   // Build Leaderboard of Top Referrers
-  const referrerCounts = new Map<string, { profile: any; total: number; completed: number }>();
+  type ReferralProfile = {
+    user_id: string;
+    username: string;
+    avatar_url: string | null;
+    email: string | null;
+    referral_code: string | null;
+  };
+
+  const referrerCounts = new Map<
+    string,
+    { profile: ReferralProfile; total: number; completed: number }
+  >();
   referrals.forEach((r) => {
     if (!r.referrer_id) return;
     const current = referrerCounts.get(r.referrer_id) || {
@@ -165,7 +196,7 @@ export default function AdminReferrals() {
           user_id: referrerId,
           type: "referral",
           title: "Referral Bonus",
-          coins: 100,
+          amount: 100,
           description: "Bonus awarded for referring a new member to GameFlex",
         });
       } catch {
@@ -305,7 +336,7 @@ export default function AdminReferrals() {
                     #{idx + 1}
                   </div>
                   <Avatar className="h-12 w-12 mb-2 border-2 border-primary/20">
-                    <AvatarImage src={item.profile?.avatar_url} />
+                    <AvatarImage src={item.profile?.avatar_url ?? undefined} />
                     <AvatarFallback className="font-bold bg-primary/10 text-primary">
                       {item.profile?.username?.slice(0, 2).toUpperCase() || "U"}
                     </AvatarFallback>
@@ -407,7 +438,7 @@ export default function AdminReferrals() {
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={item.referrer?.avatar_url} />
+                            <AvatarImage src={item.referrer?.avatar_url ?? undefined} />
                             <AvatarFallback className="text-xs font-bold">
                               {item.referrer?.username?.slice(0, 2).toUpperCase() || "R"}
                             </AvatarFallback>

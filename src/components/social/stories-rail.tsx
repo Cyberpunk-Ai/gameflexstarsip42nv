@@ -66,21 +66,25 @@ async function decodeCommentContent(content: string, isEncrypted: boolean) {
 export function StoryViewer({
   userGroups,
   initialGroupIndex = 0,
+  initialStoryIndex = 0,
+  openComments = false,
   onClose,
 }: {
   userGroups: { user_id: string; profile: any; stories: any[] }[];
   initialGroupIndex?: number;
+  initialStoryIndex?: number;
+  openComments?: boolean;
   onClose: () => void;
 }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [groupIndex, setGroupIndex] = useState(initialGroupIndex);
-  const [storyIndex, setStoryIndex] = useState(0);
+  const [storyIndex, setStoryIndex] = useState(initialStoryIndex);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(openComments);
   const [reactionAnim, setReactionAnim] = useState<string | null>(null);
   const [likeAnim, setLikeAnim] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

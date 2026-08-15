@@ -14,4 +14,5 @@ export * from "./realtime";
 export * from "./marketplace";
 export * from "./messages";
 export * from "./achievements";
-export * from "./admin";
+export type { Profile as AdminProfile } from "./admin";
+export { AdminService, adminService } from "./admin";

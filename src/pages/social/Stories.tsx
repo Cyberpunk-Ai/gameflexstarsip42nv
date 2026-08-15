@@ -24,6 +24,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { StoryViewer } from "@/components/social/stories-rail";
+import { recommendationService } from "@/services/recommendations/RecommendationService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -632,7 +633,7 @@ export default function Stories() {
         if (!data.length) {
           throw new Error("no-recommendations");
         }
-        const ids = [...new Set(data.map((s: any) => s.user_id))];
+        const ids = [...new Set(data.map((s: any) => s.user_id as string))];
         const { data: profiles } = await backend
           .from("profiles")
           .select("user_id, username, avatar_url")
@@ -671,7 +672,7 @@ export default function Stories() {
 
         if (!data?.length) return [];
 
-        const ids = [...new Set(data.map((s: any) => s.user_id))];
+        const ids = [...new Set(data.map((s: any) => s.user_id as string))];
         const { data: profiles } = await backend
           .from("profiles")
           .select("user_id, username, avatar_url")

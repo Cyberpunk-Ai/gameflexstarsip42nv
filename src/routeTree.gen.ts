@@ -27,6 +27,7 @@ import { Route as FlexRouteImport } from './routes/flex'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as GameRoomsRouteImport } from './routes/game-rooms'
+import { Route as HealthzRouteImport } from './routes/healthz'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -172,6 +173,11 @@ const FriendsRoute = FriendsRouteImport.update({
 const GameRoomsRoute = GameRoomsRouteImport.update({
   id: '/game-rooms',
   path: '/game-rooms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthzRoute = HealthzRouteImport.update({
+  id: '/healthz',
+  path: '/healthz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -474,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/friends': typeof FriendsRoute
   '/game-rooms': typeof GameRoomsRoute
+  '/healthz': typeof HealthzRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -549,6 +556,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/friends': typeof FriendsRoute
   '/game-rooms': typeof GameRoomsRoute
+  '/healthz': typeof HealthzRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -624,6 +632,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/friends': typeof FriendsRoute
   '/game-rooms': typeof GameRoomsRoute
+  '/healthz': typeof HealthzRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -702,6 +711,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/friends'
     | '/game-rooms'
+    | '/healthz'
     | '/help'
     | '/how-it-works'
     | '/leaderboard'
@@ -777,6 +787,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/friends'
     | '/game-rooms'
+    | '/healthz'
     | '/help'
     | '/how-it-works'
     | '/leaderboard'
@@ -851,6 +862,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/friends'
     | '/game-rooms'
+    | '/healthz'
     | '/help'
     | '/how-it-works'
     | '/leaderboard'
@@ -928,6 +940,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   FriendsRoute: typeof FriendsRoute
   GameRoomsRoute: typeof GameRoomsRoute
+  HealthzRoute: typeof HealthzRoute
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -1091,6 +1104,13 @@ declare module '@tanstack/react-router' {
       path: '/game-rooms'
       fullPath: '/game-rooms'
       preLoaderRoute: typeof GameRoomsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/healthz': {
+      id: '/healthz'
+      path: '/healthz'
+      fullPath: '/healthz'
+      preLoaderRoute: typeof HealthzRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -1574,6 +1594,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   FriendsRoute: FriendsRoute,
   GameRoomsRoute: GameRoomsRoute,
+  HealthzRoute: HealthzRoute,
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
   LeaderboardRoute: LeaderboardRoute,
