@@ -97,10 +97,13 @@ export function SquadPlanner({ squad }: { squad: Squad }) {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {gameLabel(e.game)} · {format(new Date(e.startsAt ?? Date.now()), "EEE d MMM, HH:mm")} ·{" "}
+                    {gameLabel(e.game)} ·{" "}
+                    {format(new Date(e.startsAt ?? Date.now()), "EEE d MMM, HH:mm")} ·{" "}
                     {past
                       ? "completed"
-                      : formatDistanceToNow(new Date(e.startsAt ?? Date.now()), { addSuffix: true })}
+                      : formatDistanceToNow(new Date(e.startsAt ?? Date.now()), {
+                          addSuffix: true,
+                        })}
                   </p>
                   {e.notes && <p className="text-xs text-foreground/70 mt-2">{e.notes}</p>}
                   <div className="flex items-center gap-2 mt-3 flex-wrap">

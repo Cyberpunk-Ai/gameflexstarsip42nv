@@ -21,12 +21,11 @@ function readEnv(name: string): string | undefined {
 }
 
 /** Social providers enabled for this deployment. */
-export const enabledOAuthProviders: OAuthProvider[] = (
-  readEnv("VITE_OAUTH_PROVIDERS")
+export const enabledOAuthProviders: OAuthProvider[] =
+  (readEnv("VITE_OAUTH_PROVIDERS")
     ?.split(",")
     .map((p) => p.trim().toLowerCase())
-    .filter(Boolean) as OAuthProvider[] | undefined
-) ?? DEFAULT_PROVIDERS;
+    .filter(Boolean) as OAuthProvider[] | undefined) ?? DEFAULT_PROVIDERS;
 
 export function isOAuthProviderEnabled(provider: OAuthProvider): boolean {
   return enabledOAuthProviders.includes(provider);

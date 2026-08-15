@@ -279,7 +279,8 @@ export function SettingsManager({
         bio: bio.trim(),
         website: website.trim(),
         avatar_url: avatarUrl,
-        platform: platform as unknown as import("@/integrations/supabase/types").Database["public"]["Enums"]["platform_type"],
+        platform:
+          platform as unknown as import("@/integrations/supabase/types").Database["public"]["Enums"]["platform_type"],
         favorite_genres: favoriteGenres,
         updated_at: new Date().toISOString(),
       };

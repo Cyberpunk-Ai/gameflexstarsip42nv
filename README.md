@@ -25,14 +25,14 @@ The app runs at http://localhost:8080.
 
 ## Scripts
 
-| Script | Purpose |
-| --- | --- |
-| `npm run dev` | Start the dev server with HMR |
-| `npm run build` | Production build (`.output/`) |
-| `npm start` | Run the built server (`node .output/server/index.mjs`) |
-| `npm run typecheck` | TypeScript check, no emit |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier |
+| Script              | Purpose                                                |
+| ------------------- | ------------------------------------------------------ |
+| `npm run dev`       | Start the dev server with HMR                          |
+| `npm run build`     | Production build (`.output/`)                          |
+| `npm start`         | Run the built server (`node .output/server/index.mjs`) |
+| `npm run typecheck` | TypeScript check, no emit                              |
+| `npm run lint`      | ESLint                                                 |
+| `npm run format`    | Prettier                                               |
 
 ## Configuration
 
@@ -44,12 +44,12 @@ list. No hosting platform, vendor SDK or proprietary service is required.
 Each capability is selected independently, so you can migrate one piece at a
 time (details in [`docs/backend-providers.md`](docs/backend-providers.md)):
 
-| Variable | Values | Default |
-| --- | --- | --- |
-| `VITE_BACKEND_PROVIDER` | `supabase`, `rest` | `supabase` |
-| `VITE_AUTH_PROVIDER` | `supabase`, `custom` | `supabase` |
-| `VITE_STORAGE_PROVIDER` | `supabase`, `s3`, `r2`, `vps` | `supabase` |
-| `VITE_REALTIME_PROVIDER` | `supabase`, `none` | `supabase` |
+| Variable                 | Values                        | Default    |
+| ------------------------ | ----------------------------- | ---------- |
+| `VITE_BACKEND_PROVIDER`  | `supabase`, `rest`            | `supabase` |
+| `VITE_AUTH_PROVIDER`     | `supabase`, `custom`          | `supabase` |
+| `VITE_STORAGE_PROVIDER`  | `supabase`, `s3`, `r2`, `vps` | `supabase` |
+| `VITE_REALTIME_PROVIDER` | `supabase`, `none`            | `supabase` |
 
 Supply the matching credentials (`VITE_SUPABASE_URL`,
 `VITE_SUPABASE_PUBLISHABLE_KEY`, or `VITE_BACKEND_REST_URL` /

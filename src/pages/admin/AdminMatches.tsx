@@ -78,10 +78,9 @@ export default function AdminMatches() {
       // Fetch player profiles
       const playerIds = [
         ...new Set(
-          [
-            ...data.map((m) => m.player1_id),
-            ...data.map((m) => m.player2_id),
-          ].filter((id): id is string => Boolean(id))
+          [...data.map((m) => m.player1_id), ...data.map((m) => m.player2_id)].filter(
+            (id): id is string => Boolean(id),
+          ),
         ),
       ];
 

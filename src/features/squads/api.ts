@@ -293,22 +293,24 @@ export async function fetchMyJoinRequests(userId: string) {
 }
 
 export async function requestToJoin(squadId: string, userId: string, message?: string) {
-  const { error } = await backend
-    .from("squad_join_requests")
-    .upsert(
-      {
-        squad_id: squadId,
-        user_id: userId,
-        message: message ?? null,
-        status: "pending",
-        responded_at: null,
-      },
-      { onConflict: "squad_id,user_id" },
-    );
+  const { error } = await backend.from("squad_join_requests").upsert(
+    {
+      squad_id: squadId,
+      user_id: userId,
+      message: message ?? null,
+      status: "pending",
+      responded_at: null,
+    },
+    { onConflict: "squad_id,user_id" },
+  );
   if (error) throw error;
 }
 
-export async function respondToJoinRequest(requestId: string, approve: boolean, _officerId: string) {
+export async function respondToJoinRequest(
+  requestId: string,
+  approve: boolean,
+  _officerId: string,
+) {
   const { error } = await backend
     .from("squad_join_requests")
     .update({ status: approve ? "accepted" : "rejected", responded_at: new Date().toISOString() })

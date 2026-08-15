@@ -314,7 +314,15 @@ export function useDataHealth() {
         tables.map(async (table) => {
           const t0 = performance.now();
           const { count, error } = await backend
-            .from(table as "profiles" | "tournaments" | "registrations" | "payments" | "matches" | "notifications")
+            .from(
+              table as
+                | "profiles"
+                | "tournaments"
+                | "registrations"
+                | "payments"
+                | "matches"
+                | "notifications",
+            )
             .select("*", { count: "exact", head: true });
           return {
             table,
