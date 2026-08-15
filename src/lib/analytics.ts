@@ -35,9 +35,9 @@ function getDevice(): string {
   return "desktop";
 }
 
-// Set to true after running the analytics_events Supabase migration.
-// Keeping it false prevents HTTP 400 errors when the table doesn't exist yet.
-const ANALYTICS_ENABLED = false;
+// Analytics writes to the `analytics_events` table. Disable per-environment
+// with VITE_ANALYTICS_ENABLED=false.
+const ANALYTICS_ENABLED = import.meta.env["VITE_ANALYTICS_ENABLED"] !== "false";
 
 export async function track(
   event: AnalyticsEvent,
@@ -46,19 +46,21 @@ export async function track(
   if (!ANALYTICS_ENABLED || typeof window === "undefined") return;
   try {
     const { data: userData } = await backend.auth.getUser();
-    const payload = {
+    await backend.from("analytics_events").insert({
       user_id: userData?.user?.id ?? null,
       event_name: event,
-      properties,
-      session_id: getSessionId(),
-      device: getDevice(),
-      path: window.location.pathname,
-    };
-    await backend.from("analytics_events").insert(payload);
+      properties: {
+        ...properties,
+        session_id: getSessionId(),
+        device: getDevice(),
+        path: window.location.pathname,
+      } as never,
+    });
   } catch (err) {
     if (import.meta.env.DEV) console.warn("[analytics] track failed", err);
   }
 }
+
 
 let sessionStarted = false;
 export function startSession() {
