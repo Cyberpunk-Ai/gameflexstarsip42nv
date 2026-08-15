@@ -61,7 +61,6 @@ export async function track(
   }
 }
 
-
 let sessionStarted = false;
 export function startSession() {
   if (sessionStarted) return;

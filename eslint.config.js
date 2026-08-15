@@ -42,7 +42,6 @@ export default tseslint.config(
       // Tracked technical debt: `any` is reported but does not fail CI. New code
       // should use precise types or `unknown`; the count should trend to zero.
       "@typescript-eslint/no-explicit-any": "warn",
-
     },
   },
   {
