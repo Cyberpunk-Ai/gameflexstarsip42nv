@@ -74,9 +74,27 @@ SQL migrations live in `supabase/migrations/`. Apply them with the Supabase CLI
 
 ## Deployment
 
-`npm run build` produces a self-contained Node server in `.output/`. Deploy it
-anywhere that runs Node (a VPS, Docker, Fly.io, Render, Cloudflare, …) and set
-the same environment variables in that environment.
+`npm run build` produces a self-contained server bundle in `.output/`. Deploy it
+anywhere that runs Node or a Worker runtime (VPS, Docker, Fly.io, Render,
+Cloudflare, …) and set the same environment variables in that environment.
+
+Docker (Node server target):
+
+```bash
+docker build -t gameflex .
+docker run -p 8080:8080 --env-file .env gameflex
+```
+
+Operational endpoints:
+
+- `GET /healthz` — dependency-free liveness/readiness probe (used by the
+  container `HEALTHCHECK` and by load balancers).
+- `GET /sitemap.xml` — generated from the public route list; the origin comes
+  from `SITE_URL`/`VITE_SITE_URL`, falling back to the request origin.
+
+Pre-deploy checklist: `npm run lint`, `bunx tsgo --noEmit`, `npm run build`, and
+apply pending SQL from `supabase/migrations/`.
+
 
 ## Project structure
 
