@@ -77,10 +77,12 @@ export default function AdminMatches() {
 
       // Fetch player profiles
       const playerIds = [
-        ...new Set([
-          ...data.map((m) => m.player1_id).filter(Boolean),
-          ...data.map((m) => m.player2_id).filter(Boolean),
-        ]),
+        ...new Set(
+          [
+            ...data.map((m) => m.player1_id),
+            ...data.map((m) => m.player2_id),
+          ].filter((id): id is string => Boolean(id))
+        ),
       ];
 
       const { data: profiles } = await backend
@@ -92,8 +94,8 @@ export default function AdminMatches() {
 
       return data.map((m) => ({
         ...m,
-        player1: profileMap.get(m.player1_id),
-        player2: profileMap.get(m.player2_id),
+        player1: m.player1_id ? profileMap.get(m.player1_id) : undefined,
+        player2: m.player2_id ? profileMap.get(m.player2_id) : undefined,
         winner: m.winner_id ? profileMap.get(m.winner_id) : null,
       }));
     },

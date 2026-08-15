@@ -38,15 +38,15 @@ import { formatDistanceToNow } from "date-fns";
 interface LeaderboardEntry {
   id: string;
   user_id: string;
-  wins: number;
-  losses: number;
-  points: number;
-  earnings: number;
-  tournaments_played: number;
+  wins: number | null;
+  losses: number | null;
+  points: number | null;
+  earnings: number | null;
+  tournaments_played: number | null;
   updated_at: string;
   profile?: {
     username: string;
-    avatar_url: string;
+    avatar_url: string | null;
   };
 }
 
@@ -299,7 +299,7 @@ export default function AdminLeaderboard() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={entry.profile?.avatar_url} />
+                            <AvatarImage src={entry.profile?.avatar_url ?? undefined} />
                             <AvatarFallback>
                               {entry.profile?.username?.charAt(0).toUpperCase() ?? "?"}
                             </AvatarFallback>
