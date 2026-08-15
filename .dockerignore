@@ -3,7 +3,6 @@ dist
 .nitro
 .tanstack
 .vinxi
-dist
 dist-ssr
 .git
 .env
