@@ -494,6 +494,10 @@ export type Database = {
           followers_count: number | null;
           following_count: number | null;
           game_handle: string | null;
+          full_name: string | null;
+          website: string | null;
+          platform: Database["public"]["Enums"]["platform_type"] | null;
+          favorite_genres: string[];
           id: string;
           is_verified: boolean | null;
           phone: string | null;
@@ -512,6 +516,10 @@ export type Database = {
           followers_count?: number | null;
           following_count?: number | null;
           game_handle?: string | null;
+          full_name?: string | null;
+          website?: string | null;
+          platform?: Database["public"]["Enums"]["platform_type"] | null;
+          favorite_genres?: string[];
           id?: string;
           is_verified?: boolean | null;
           phone?: string | null;
@@ -530,6 +538,10 @@ export type Database = {
           followers_count?: number | null;
           following_count?: number | null;
           game_handle?: string | null;
+          full_name?: string | null;
+          website?: string | null;
+          platform?: Database["public"]["Enums"]["platform_type"] | null;
+          favorite_genres?: string[];
           id?: string;
           is_verified?: boolean | null;
           phone?: string | null;
@@ -632,6 +644,7 @@ export type Database = {
           expires_at: string | null;
           id: string;
           status: string | null;
+          title: string | null;
           tournament_id: string | null;
           type: Database["public"]["Enums"]["reward_type"];
           user_id: string;
@@ -644,6 +657,7 @@ export type Database = {
           expires_at?: string | null;
           id?: string;
           status?: string | null;
+          title?: string | null;
           tournament_id?: string | null;
           type: Database["public"]["Enums"]["reward_type"];
           user_id: string;
@@ -656,6 +670,7 @@ export type Database = {
           expires_at?: string | null;
           id?: string;
           status?: string | null;
+          title?: string | null;
           tournament_id?: string | null;
           type?: Database["public"]["Enums"]["reward_type"];
           user_id?: string;
@@ -675,28 +690,43 @@ export type Database = {
           created_at: string;
           created_by: string;
           description: string | null;
+          game: Database["public"]["Enums"]["game_type"] | null;
           id: string;
-          scheduled_at: string;
+          notes: string | null;
+          rsvps: Json;
+          scheduled_at: string | null;
           squad_id: string;
+          starts_at: string | null;
           title: string;
+          type: string;
         };
         Insert: {
           created_at?: string;
           created_by: string;
           description?: string | null;
+          game?: Database["public"]["Enums"]["game_type"] | null;
           id?: string;
-          scheduled_at: string;
+          notes?: string | null;
+          rsvps?: Json;
+          scheduled_at?: string | null;
           squad_id: string;
+          starts_at?: string | null;
           title: string;
+          type?: string;
         };
         Update: {
           created_at?: string;
           created_by?: string;
           description?: string | null;
+          game?: Database["public"]["Enums"]["game_type"] | null;
           id?: string;
-          scheduled_at?: string;
+          notes?: string | null;
+          rsvps?: Json;
+          scheduled_at?: string | null;
           squad_id?: string;
+          starts_at?: string | null;
           title?: string;
+          type?: string;
         };
         Relationships: [
           {
@@ -827,25 +857,37 @@ export type Database = {
       };
       squad_messages: {
         Row: {
+          avatar_url: string | null;
           content: string;
           created_at: string;
           id: string;
+          is_system: boolean;
+          pinned: boolean;
           squad_id: string;
           user_id: string;
+          username: string | null;
         };
         Insert: {
+          avatar_url?: string | null;
           content: string;
           created_at?: string;
           id?: string;
+          is_system?: boolean;
+          pinned?: boolean;
           squad_id: string;
           user_id: string;
+          username?: string | null;
         };
         Update: {
+          avatar_url?: string | null;
           content?: string;
           created_at?: string;
           id?: string;
+          is_system?: boolean;
+          pinned?: boolean;
           squad_id?: string;
           user_id?: string;
+          username?: string | null;
         };
         Relationships: [
           {
@@ -1298,6 +1340,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      delete_user_account: { Args: Record<string, never>; Returns: undefined };
       evaluate_achievements: { Args: { _user_id: string }; Returns: undefined };
       has_role: {
         Args: {
