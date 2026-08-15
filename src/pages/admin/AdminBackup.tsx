@@ -285,7 +285,10 @@ export default function AdminBackup() {
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {format(new Date(b.created_at), "PPpp")} · {formatBytes(b.size_bytes)} ·{" "}
-                      {Object.values(b.table_counts ?? {}).reduce((a: any, c: any) => a + c, 0)}{" "}
+                      {Object.values((b.table_counts ?? {}) as Record<string, number>).reduce(
+                        (a: number, c: number) => a + c,
+                        0
+                      )}{" "}
                       rows
                       {b.includes_storage ? ` · ${b.storage_file_count} files` : ""}
                     </div>
