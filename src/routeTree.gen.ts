@@ -49,6 +49,7 @@ import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as TeamsRouteImport } from './routes/teams'
@@ -285,6 +286,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialRoute = SocialRouteImport.update({
   id: '/social',
   path: '/social',
@@ -502,6 +508,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/support': typeof SupportRoute
   '/teams': typeof TeamsRouteWithChildren
@@ -578,6 +585,7 @@ export interface FileRoutesByTo {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/trending': typeof TrendingRoute
@@ -654,6 +662,7 @@ export interface FileRoutesById {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/support': typeof SupportRoute
   '/teams': typeof TeamsRouteWithChildren
@@ -733,6 +742,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/sitemap.xml'
     | '/social'
     | '/support'
     | '/teams'
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/sitemap.xml'
     | '/support'
     | '/terms'
     | '/trending'
@@ -884,6 +895,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/sitemap.xml'
     | '/social'
     | '/support'
     | '/teams'
@@ -962,6 +974,7 @@ export interface RootRouteChildren {
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
   SupportRoute: typeof SupportRoute
   TeamsRoute: typeof TeamsRouteWithChildren
@@ -1258,6 +1271,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social': {
@@ -1616,6 +1636,7 @@ const rootRouteChildren: RootRouteChildren = {
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
   SupportRoute: SupportRoute,
   TeamsRoute: TeamsRouteWithChildren,
